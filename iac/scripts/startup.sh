@@ -37,32 +37,39 @@ mkdir -p $MOUNT_POINT/signal-data
 
 IMAGE_URI="${region}-docker.pkg.dev/${project_id}/openclaw-repo/openclaw:${image_tag}"
 
-cat <<EOF > config.yaml
-llm:
-  provider: opencode
-  model: opencode/gemini-3-pro
-  flashModel: opencode/gemini-3-flash
-
-gateway:
-  enabled: false
-  
-providers:
-  opencode:
-    enabled: true
-    settings:
-      antigravity:
-        enabled: true
-        account_strategy: "hybrid"
-
-plugins:
-  - "opencode-antigravity-auth"
-
-channels:
-  signal:
-    enabled: true
-    account: ${signal_phone_number}
-    httpUrl: http://signal-sidecar:8080
-    autoStart: false
+cat <<EOF > config.json
+{
+  "llm": {
+    "provider": "opencode",
+    "model": "opencode/gemini-3-pro",
+    "flashModel": "opencode/gemini-3-flash"
+  },
+  "gateway": {
+    "enabled": false
+  },
+  "providers": {
+    "opencode": {
+      "enabled": true,
+      "settings": {
+        "antigravity": {
+          "enabled": true,
+          "account_strategy": "hybrid"
+        }
+      }
+    }
+  },
+  "plugins": [
+    "opencode-antigravity-auth"
+  ],
+  "channels": {
+    "signal": {
+      "enabled": true,
+      "account": "${signal_phone_number}",
+      "httpUrl": "http://signal-sidecar:8080",
+      "autoStart": false
+    }
+  }
+}
 EOF
 
 cat <<EOF > docker-compose.yml
@@ -72,11 +79,11 @@ services:
     restart: always
     environment:
       - OPENCODE_CONFIG_DIR=/home/node/.config/opencode
-      - OPENCLAW_CONFIG_PATH=/home/node/.openclaw/config.yaml
+      - OPENCLAW_CONFIG_PATH=/home/node/.openclaw/config.json
       - OPENCLAW_GATEWAY_ENABLED=false
       - OPENCLAW_GATEWAY_TOKEN=dummy
     volumes:
-      - ./config.yaml:/home/node/.openclaw/config.yaml
+      - ./config.json:/home/node/.openclaw/config.json
       - .:/home/node/.openclaw
       - ./config/opencode:/home/node/.config/opencode
     depends_on:
