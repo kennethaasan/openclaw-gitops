@@ -3,12 +3,26 @@ provider "google" {
   region  = var.region
 }
 
-# 0. Artifact Registry (Stores your custom OpenClaw images)
+# 0. Enable APIs
+resource "google_project_service" "artifactregistry" {
+  project            = var.project_id
+  service            = "artifactregistry.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "compute" {
+  project            = var.project_id
+  service            = "compute.googleapis.com"
+  disable_on_destroy = false
+}
+
+# 1. Artifact Registry (Stores your custom OpenClaw images)
 resource "google_artifact_registry_repository" "openclaw_repo" {
   location      = var.region
   repository_id = "openclaw-repo"
   description   = "Docker repository for OpenClaw custom images"
   format        = "DOCKER"
+  depends_on    = [google_project_service.artifactregistry]
 }
 
 # 1. Persistent Disk (Stores Signal sessions and Agent memory)
@@ -30,6 +44,7 @@ resource "google_compute_instance" "openclaw_server" {
   name         = "openclaw-agent"
   machine_type = var.machine_type
   zone         = var.zone
+  depends_on   = [google_project_service.compute, google_compute_disk.openclaw_data]
 
   # Spot Instance Configuration (Keeping costs under $10)
   scheduling {

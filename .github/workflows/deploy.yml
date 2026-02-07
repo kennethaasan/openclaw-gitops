@@ -31,9 +31,35 @@ jobs:
       - name: Run Biome
         run: npm run lint
 
-  build-and-push:
+  # Job 1: Provision Infrastructure (Create Registry, VM, Disk)
+  deploy-infra:
     needs: lint
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform Init
+        working-directory: iac
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: iac
+        run: |
+          terraform apply -auto-approve \
+            -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
+            -var="signal_phone_number=${{ secrets.SIGNAL_PHONE_NUMBER }}" \
+            -var="image_tag=latest"
+
+  # Job 2: Build and Push Docker Image (Now that Registry exists)
+  build-and-push:
+    needs: deploy-infra
     runs-on: ubuntu-latest
     permissions:
       contents: 'read'
@@ -51,9 +77,6 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'
 
-      - name: 'Enable Artifact Registry API'
-        run: gcloud services enable artifactregistry.googleapis.com
-
       - name: 'Docker Auth'
         run: |-
           gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
@@ -63,7 +86,8 @@ jobs:
           docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:${{ github.sha }}" -f docker/Dockerfile .
           docker push "${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:${{ github.sha }}"
 
-  deploy-infra:
+  # Job 3: Update VM with New Image Tag
+  update-vm:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
