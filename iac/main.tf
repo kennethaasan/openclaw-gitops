@@ -20,7 +20,7 @@ resource "google_compute_disk" "openclaw_data" {
   name = "openclaw-data-disk"
   type = "pd-standard"
   zone = var.zone
-  size = 10
+  size = 20
 }
 
 # 2. Static IP (Required for consistent communication)
@@ -46,7 +46,7 @@ resource "google_compute_instance" "openclaw_server" {
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-12"
-      size  = 10
+      size  = 20
     }
   }
 
