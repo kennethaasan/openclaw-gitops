@@ -71,15 +71,16 @@ services:
     image: $IMAGE_URI
     restart: always
     environment:
-      - OPENCODE_CONFIG_DIR=/root/.config/opencode
+      - OPENCODE_CONFIG_DIR=/home/node/.config/opencode
       - OPENCLAW_GATEWAY_ENABLED=false
       - OPENCLAW_GATEWAY_TOKEN=dummy
     volumes:
-      - ./config.yaml:/root/.openclaw/config.yaml
-      - .:/root/.openclaw
-      - ./config/opencode:/root/.config/opencode
+      - ./config.yaml:/home/node/.openclaw/config.yaml
+      - .:/home/node/.openclaw
+      - ./config/opencode:/home/node/.config/opencode
     depends_on:
       - signal-sidecar
+
 
   signal-sidecar:
     image: bbernhard/signal-cli-rest-api:latest
