@@ -42,6 +42,9 @@ llm:
   provider: opencode
   model: opencode/gemini-3-pro
   flashModel: opencode/gemini-3-flash
+
+gateway:
+  enabled: false
   
 providers:
   opencode:
