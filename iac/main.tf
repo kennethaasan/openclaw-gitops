@@ -4,16 +4,24 @@ provider "google" {
 }
 
 # 0. Enable APIs
+resource "google_project_service" "serviceusage" {
+  project            = var.project_id
+  service            = "serviceusage.googleapis.com"
+  disable_on_destroy = false
+}
+
 resource "google_project_service" "artifactregistry" {
   project            = var.project_id
   service            = "artifactregistry.googleapis.com"
   disable_on_destroy = false
+  depends_on         = [google_project_service.serviceusage]
 }
 
 resource "google_project_service" "compute" {
   project            = var.project_id
   service            = "compute.googleapis.com"
   disable_on_destroy = false
+  depends_on         = [google_project_service.serviceusage]
 }
 
 # 1. Artifact Registry (Stores your custom OpenClaw images)
