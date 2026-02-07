@@ -1,8 +1,9 @@
 # OpenClaw 2026 Configuration - Antigravity Edition
 llm:
   provider: opencode
-  model: opencode/gemini-3-pro  # High-tier reasoning via Antigravity
-  flashModel: opencode/gemini-3-flash # High-speed vision/tasks
+  model: google/antigravity-claude-opus-4-6-thinking  # Ultra-tier reasoning via Antigravity
+  flashModel: google/antigravity-gemini-3-flash # High-speed vision/tasks
+  variant: max # Use max thinking budget for Opus 4.6
   
 providers:
   opencode:
