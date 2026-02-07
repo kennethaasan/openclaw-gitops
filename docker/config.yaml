@@ -1,0 +1,23 @@
+# OpenClaw 2026 Configuration - Antigravity Edition
+llm:
+  provider: opencode
+  model: opencode/gemini-3-pro  # High-tier reasoning via Antigravity
+  flashModel: opencode/gemini-3-flash # High-speed vision/tasks
+  
+providers:
+  opencode:
+    enabled: true
+    settings:
+      antigravity:
+        enabled: true
+        account_strategy: "hybrid"
+
+plugins:
+  - "opencode-antigravity-auth"
+
+channels:
+  signal:
+    enabled: true
+    account: ${SIGNAL_ACCOUNT}
+    httpUrl: ${SIGNAL_URL}
+    autoStart: false
