@@ -105,7 +105,7 @@ resource "google_compute_firewall" "allow_ui_from_cloudflare" {
     ports    = ["3000"]
   }
 
-  source_ranges = data.cloudflare_ip_ranges.cloudflare.cidr_blocks
+  source_ranges = data.cloudflare_ip_ranges.cloudflare.ipv4_cidr_blocks
   target_tags   = ["openclaw-server"]
 }
 
