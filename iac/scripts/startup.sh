@@ -40,34 +40,14 @@ IMAGE_URI="${region}-docker.pkg.dev/${project_id}/openclaw-repo/openclaw:${image
 
 cat <<EOF > config.json
 {
-  "llm": {
-    "provider": "opencode",
-    "model": "opencode/gemini-3-pro",
-    "flashModel": "opencode/gemini-3-flash"
-  },
-  "gateway": {
-    "enabled": false
-  },
-  "providers": {
-    "opencode": {
-      "enabled": true,
-      "settings": {
-        "antigravity": {
-          "enabled": true,
-          "account_strategy": "hybrid"
-        }
-      }
-    }
-  },
-  "plugins": [
-    "opencode-antigravity-auth"
-  ],
+  "provider": "opencode",
+  "model": "opencode/gemini-3-pro",
+  "flashModel": "opencode/gemini-3-flash",
   "channels": {
     "signal": {
       "enabled": true,
       "account": "${signal_phone_number}",
-      "httpUrl": "http://signal-sidecar:8080",
-      "autoStart": false
+      "httpUrl": "http://signal-sidecar:8080"
     }
   }
 }
