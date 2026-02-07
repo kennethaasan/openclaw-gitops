@@ -20,10 +20,14 @@ A professional-grade, zero-cost DevOps stack for running the **OpenClaw AI Agent
 Add the following to your GitHub Repo Secrets:
 - `TF_API_TOKEN`: Your Terraform Cloud API token.
 - `GCP_PROJECT_ID`: Your Google Cloud Project ID.
+- `GCP_CREDENTIALS`: A Google Cloud Service Account key (JSON) with permissions for Artifact Registry and Compute Engine.
 - `SIGNAL_PHONE_NUMBER`: Your phone number in E.164 format (e.g., `+4712345678`).
 
-### 2. Push to Main
-Push this repository to GitHub. The CI/CD pipeline will automatically provision your server in Stockholm.
+### 2. Version Management
+The version of OpenClaw is pinned in `docker/Dockerfile`. To update:
+1. Change the version tag in `docker/Dockerfile` (e.g., `v2026.x.y`).
+2. Push to `main`.
+The CI/CD pipeline will build a new custom image, push it to your private Google Artifact Registry, and update your server.
 
 ### 3. Authenticate Gemini 3 (Antigravity)
 Since the server is headless, you must authenticate locally and sync the session:

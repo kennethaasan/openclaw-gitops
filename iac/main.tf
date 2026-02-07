@@ -3,6 +3,14 @@ provider "google" {
   region  = var.region
 }
 
+# 0. Artifact Registry (Stores your custom OpenClaw images)
+resource "google_artifact_registry_repository" "openclaw_repo" {
+  location      = var.region
+  repository_id = "openclaw-repo"
+  description   = "Docker repository for OpenClaw custom images"
+  format        = "DOCKER"
+}
+
 # 1. Persistent Disk (Stores Signal sessions and Agent memory)
 resource "google_compute_disk" "openclaw_data" {
   name = "openclaw-data-disk"
@@ -52,6 +60,8 @@ resource "google_compute_instance" "openclaw_server" {
   }
 
   metadata_startup_script = templatefile("${path.module}/scripts/startup.sh", {
+    project_id          = var.project_id
+    region              = var.region
     signal_phone_number = var.signal_phone_number
     image_tag           = var.image_tag
   })

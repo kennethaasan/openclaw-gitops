@@ -1,8 +1,10 @@
 AGENT QUICK REFERENCE
 
 1. Setup: This project runs on GCP Spot VMs using Terraform Cloud for CI/CD. The AI engine is OpenClaw, bridged via opencode-antigravity-auth to access Gemini 3 Pro/Flash.
-2. Deployment: Push to main triggers GitHub Actions -> Terraform Cloud -> GCP Stockholm (europe-north2).
-3. Secrets: Never commit secrets. Use GitHub Secrets for TF_API_TOKEN, GCP_PROJECT_ID, and SIGNAL_PHONE_NUMBER.
+2. Deployment: Push to main triggers GitHub Actions (Docker Build & Push) -> Terraform Cloud -> GCP Stockholm (europe-north2).
+3. Secrets: Never commit secrets. Use GitHub Secrets for TF_API_TOKEN, GCP_PROJECT_ID, GCP_CREDENTIALS, and SIGNAL_PHONE_NUMBER.
+...
+10. Versioning: OpenClaw version is pinned in `docker/Dockerfile`. Deployment uses a private Google Artifact Registry (`openclaw-repo`).
 4. Persistence: Data is stored on a persistent GCP disk mounted at /mnt/openclaw. This includes Signal sessions and Agent memory.
 5. Signal: Operates as a "Linked Device". Pairing requires running `signal-cli-rest-api link` on the server and scanning the QR code with an iPhone.
 6. Brain: Uses Gemini 3 Pro (reasoning) and Gemini 3 Flash (tasks) via the Antigravity provider.

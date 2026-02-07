@@ -19,33 +19,24 @@ if ! mount | grep -q "$MOUNT_POINT"; then
   mount -o discard,defaults "$DISK_PATH" "$MOUNT_POINT"
 fi
 
-# 2. Install Dependencies (Bun, Node, Docker)
+# 2. Install Docker
 if ! command -v docker &> /dev/null; then
   curl -fsSL https://get.docker.com -o get-docker.sh
   sh get-docker.sh
 fi
 
-if ! command -v bun &> /dev/null; then
-  curl -fsSL https://bun.sh/install | bash
-  export PATH="/root/.bun/bin:$PATH"
-fi
+# 3. Authenticate Docker to Google Artifact Registry
+gcloud auth configure-docker ${region}-docker.pkg.dev -q
 
-# 3. Install OpenCode & Antigravity Plugin
-export PATH="/root/.bun/bin:$PATH"
-if ! command -v opencode &> /dev/null; then
-  bun install -g opencode-ai
-fi
+# 4. Create Docker Compose & Config in the persistent mount
+cd $MOUNT_POINT
 
 # Link config to persistent storage
 mkdir -p $MOUNT_POINT/config/opencode
 mkdir -p /root/.config
 ln -sf $MOUNT_POINT/config/opencode /root/.config/opencode
 
-# Add the Antigravity plugin
-opencode plugin add opencode-antigravity-auth@latest || true
-
-# 4. Create Docker Compose & Config in the persistent mount
-cd $MOUNT_POINT
+IMAGE_URI="${region}-docker.pkg.dev/${project_id}/openclaw-repo/openclaw:${image_tag}"
 
 cat <<EOF > config.yaml
 llm:
@@ -75,7 +66,7 @@ EOF
 cat <<EOF > docker-compose.yml
 services:
   openclaw:
-    image: openclaw/openclaw:${image_tag}
+    image: $IMAGE_URI
     restart: always
     environment:
       - OPENCODE_CONFIG_DIR=/root/.config/opencode
@@ -95,5 +86,6 @@ services:
       - ./signal-data:/var/lib/signal-api
 EOF
 
-# 4. Run it
+# 5. Run it
+docker compose pull
 docker compose up -d
