@@ -77,7 +77,7 @@ services:
     environment:
       - MODE=json-rpc
     volumes:
-      - ./signal-data:/var/lib/signal-api
+      - ./signal-data:/home/.local/share/signal-cli
 EOF
 
 # 5. Run it
