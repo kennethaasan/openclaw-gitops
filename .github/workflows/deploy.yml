@@ -7,7 +7,7 @@ on:
 
 env:
   TF_CLOUD_ORG: "aasan_dev"
-  TF_WORKSPACE: "openclaw-prod"
+  TF_WORKSPACE: "openclaw-gitops"
   REGION: "europe-north2"
   REPOSITORY: "openclaw-repo"
   IMAGE: "openclaw"

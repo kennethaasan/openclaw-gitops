@@ -19,7 +19,7 @@ A professional-grade, zero-cost DevOps stack for running the **OpenClaw AI Agent
 ### 1. Configure Terraform Cloud
 1. Sign up/Login to [app.terraform.io](https://app.terraform.io).
 2. Use/Create the organization **`aasan_dev`**.
-3. Create a new Workspace named **`openclaw-prod`** using the **API-driven workflow**.
+3. Create a new Workspace named **`openclaw-gitops`** using the **API-driven workflow**.
 4. Add the following **Workspace Variables**:
    - `GOOGLE_CREDENTIALS`: Paste your GCP Service Account JSON key (ensure all newlines are removed, it should be a single string).
    - `project_id`: `YOUR_PROJECT_ID`.

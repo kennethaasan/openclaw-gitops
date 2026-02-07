@@ -4,7 +4,7 @@ terraform {
   cloud {
     organization = "aasan_dev"
     workspaces {
-      name = "openclaw-prod"
+      name = "openclaw-gitops"
     }
   }
 
