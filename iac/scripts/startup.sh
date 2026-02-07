@@ -31,9 +31,10 @@ gcloud auth configure-docker ${region}-docker.pkg.dev -q
 # 4. Create Docker Compose & Config in the persistent mount
 cd $MOUNT_POINT
 
-# Ensure persistent directories exist
+# Ensure persistent directories exist and have correct permissions
 mkdir -p $MOUNT_POINT/config/opencode
 mkdir -p $MOUNT_POINT/signal-data
+chown -R 1000:1000 $MOUNT_POINT
 
 IMAGE_URI="${region}-docker.pkg.dev/${project_id}/openclaw-repo/openclaw:${image_tag}"
 
