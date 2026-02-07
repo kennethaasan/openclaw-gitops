@@ -57,21 +57,6 @@ RUN mkdir -p /home/node/.config/opencode && \
             "medium": { "thinkingConfig": { "thinkingBudget": 16384 } },\n\
             "max": { "thinkingConfig": { "thinkingBudget": 32768 } }\n\
           }\n\
-        },\n\
-        "antigravity-gpt-5-2": {\n\
-          "name": "GPT 5.2 (Antigravity)",\n\
-          "limit": { "context": 200000, "output": 64000 },\n\
-          "modalities": { "input": ["text", "image", "pdf"], "output": ["text"] }\n\
-        },\n\
-        "antigravity-gpt-5-1-codex": {\n\
-          "name": "GPT 5.1 Codex (Antigravity)",\n\
-          "limit": { "context": 200000, "output": 64000 },\n\
-          "modalities": { "input": ["text", "image", "pdf"], "output": ["text"] }\n\
-        },\n\
-        "antigravity-minimax-m2-1": {\n\
-          "name": "Minimax M2.1 (Antigravity)",\n\
-          "limit": { "context": 200000, "output": 64000 },\n\
-          "modalities": { "input": ["text", "image", "pdf"], "output": ["text"] }\n\
         }\n\
       }\n\
     }\n\
