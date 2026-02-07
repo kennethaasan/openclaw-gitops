@@ -72,6 +72,8 @@ services:
     restart: always
     environment:
       - OPENCODE_CONFIG_DIR=/root/.config/opencode
+      - OPENCLAW_GATEWAY_ENABLED=false
+      - OPENCLAW_GATEWAY_TOKEN=dummy
     volumes:
       - ./config.yaml:/root/.openclaw/config.yaml
       - .:/root/.openclaw
