@@ -6,7 +6,7 @@ on:
   pull_request:
 
 env:
-  TF_CLOUD_ORG: "YOUR_TFC_ORG"
+  TF_CLOUD_ORG: "aasan_dev"
   TF_WORKSPACE: "openclaw-prod"
   REGION: "europe-north2"
   REPOSITORY: "openclaw-repo"
