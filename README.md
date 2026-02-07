@@ -22,14 +22,14 @@ A professional-grade, zero-cost DevOps stack for running the **OpenClaw AI Agent
 3. Create a new Workspace named **`openclaw-gitops`** using the **API-driven workflow**.
 4. Add the following **Workspace Variables**:
    - `GOOGLE_CREDENTIALS`: Paste your GCP Service Account JSON key (ensure all newlines are removed, it should be a single string).
-   - `project_id`: `YOUR_PROJECT_ID`.
+   - `project_id`: Your Google Cloud Project ID.
 
 ### 2. Configure GitHub Secrets
 Add the following to your GitHub Repo Secrets:
 - `TF_API_TOKEN`: Your Terraform Cloud API token.
-- `GCP_PROJECT_ID`: `YOUR_PROJECT_ID`.
+- `GCP_PROJECT_ID`: Your Google Cloud Project ID.
 - `GCP_CREDENTIALS`: Your GCP Service Account JSON key.
-- `SIGNAL_PHONE_NUMBER`: `YOUR_PHONE_NUMBER`.
+- `SIGNAL_PHONE_NUMBER`: Your phone number in E.164 format.
 
 ### 2. Version Management
 The version of OpenClaw is pinned in `docker/Dockerfile`. To update:
