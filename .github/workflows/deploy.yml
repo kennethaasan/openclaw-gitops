@@ -18,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24
 
@@ -31,14 +31,75 @@ jobs:
       - name: Run Biome
         run: npm run lint
 
-  # Job 1: Provision Infrastructure (Create Registry, VM, Disk)
+  infra-quality:
+    name: Infrastructure Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Check Terraform formatting
+        working-directory: iac
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        working-directory: iac
+        run: terraform init
+
+      - name: Terraform validate
+        working-directory: iac
+        run: terraform validate
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - name: Run TFLint
+        working-directory: iac
+        run: |
+          tflint --init
+          tflint --minimum-failure-severity=error
+
+  terraform-plan:
+    name: Terraform Plan
+    needs: [lint, infra-quality]
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform Init
+        working-directory: iac
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: iac
+        run: |
+          terraform plan -input=false \
+            -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
+            -var="signal_phone_number=${{ secrets.SIGNAL_PHONE_NUMBER }}" \
+            -var="image_tag=latest"
+
   deploy-infra:
-    needs: lint
+    name: Deploy Infrastructure
+    needs: [lint, infra-quality]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -57,8 +118,8 @@ jobs:
             -var="signal_phone_number=${{ secrets.SIGNAL_PHONE_NUMBER }}" \
             -var="image_tag=latest"
 
-  # Job 2: Build and Push Docker Image (Now that Registry exists)
   build-and-push:
+    name: Build and Push Docker Image
     needs: deploy-infra
     runs-on: ubuntu-latest
     permissions:
@@ -66,7 +127,7 @@ jobs:
       id-token: 'write'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
@@ -86,13 +147,13 @@ jobs:
           docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:${{ github.sha }}" -f docker/Dockerfile .
           docker push "${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:${{ github.sha }}"
 
-  # Job 3: Update VM with New Image Tag
   update-vm:
+    name: Update VM with New Tag
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
