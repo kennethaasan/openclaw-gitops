@@ -1,6 +1,6 @@
 # OpenClaw 2026 Custom Image
-# Pinning the specific version for stability
-FROM ghcr.io/openclaw/openclaw:v2026.1.29
+# Using the latest stable version
+FROM ghcr.io/openclaw/openclaw:latest
 
 # Install dependencies for the Antigravity bridge
 USER root
