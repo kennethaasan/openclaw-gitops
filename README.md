@@ -16,12 +16,20 @@ A professional-grade, zero-cost DevOps stack for running the **OpenClaw AI Agent
 
 ## Deployment Steps
 
-### 1. Configure GitHub Secrets
+### 1. Configure Terraform Cloud
+1. Sign up/Login to [app.terraform.io](https://app.terraform.io).
+2. Use/Create the organization **`aasan_dev`**.
+3. Create a new Workspace named **`openclaw-prod`** using the **API-driven workflow**.
+4. Add the following **Workspace Variables**:
+   - `GOOGLE_CREDENTIALS`: Paste your GCP Service Account JSON key (ensure all newlines are removed, it should be a single string).
+   - `project_id`: `YOUR_PROJECT_ID`.
+
+### 2. Configure GitHub Secrets
 Add the following to your GitHub Repo Secrets:
 - `TF_API_TOKEN`: Your Terraform Cloud API token.
-- `GCP_PROJECT_ID`: Your Google Cloud Project ID.
-- `GCP_CREDENTIALS`: A Google Cloud Service Account key (JSON) with permissions for Artifact Registry and Compute Engine.
-- `SIGNAL_PHONE_NUMBER`: Your phone number in E.164 format (e.g., `+4712345678`).
+- `GCP_PROJECT_ID`: `YOUR_PROJECT_ID`.
+- `GCP_CREDENTIALS`: Your GCP Service Account JSON key.
+- `SIGNAL_PHONE_NUMBER`: `YOUR_PHONE_NUMBER`.
 
 ### 2. Version Management
 The version of OpenClaw is pinned in `docker/Dockerfile`. To update:
