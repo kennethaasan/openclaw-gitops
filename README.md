@@ -8,6 +8,7 @@ A professional-grade, zero-cost DevOps stack for running the **OpenClaw AI Agent
 - **Brain:** Google Gemini 3 Pro/Flash via the `opencode-antigravity-auth` bridge.
 - **Interface:** Signal (as a linked device).
 - **CI/CD:** GitHub Actions + Terraform Cloud.
+  - Push to `main` performs: targeted core infra apply (registry/network/dns), Docker build+push, then VM update with the new Git SHA image tag.
 
 ## Prerequisites
 1. **GCP Project:** A Google Cloud project with billing enabled (using your $10 credit).
@@ -45,15 +46,18 @@ Since the server is headless, you must authenticate locally and sync the session
    opencode auth login
    # Select "Antigravity" and complete the browser login.
    ```
-2. **Transfer the session to the VM:**
-   The session is stored in `~/.config/opencode/`. You need to copy this folder to the VM's persistent mount at `/mnt/openclaw/config/opencode/`.
+2. **Transfer the session to the VM (via IAP):**
+   The session is stored in `~/.config/opencode/`. Copy this folder to the VM's persistent mount at `/mnt/openclaw/config/opencode/` using IAP tunneling.
    ```bash
-   # Use the provisioned domain: openclaw.aasan.dev
-   scp -r ~/.config/opencode root@openclaw.aasan.dev:/mnt/openclaw/config/
+   gcloud compute scp --recurse ~/.config/opencode openclaw-agent:/mnt/openclaw/config/ \
+     --zone=europe-north2-a --tunnel-through-iap
    ```
 
 ### 4. Link your Signal account
-1. SSH into the VM: `ssh root@openclaw.aasan.dev`
+1. SSH into the VM via IAP:
+   ```bash
+   gcloud compute ssh openclaw-agent --zone=europe-north2-a --tunnel-through-iap
+   ```
 2. Run the linking command:
    ```bash
    docker compose exec signal-sidecar signal-cli-rest-api link -n "OpenClaw-Agent"

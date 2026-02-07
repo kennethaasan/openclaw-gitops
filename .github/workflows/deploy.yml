@@ -114,9 +114,14 @@ jobs:
         working-directory: iac
         run: |
           terraform apply -auto-approve \
+            -target=google_artifact_registry_repository.openclaw_repo \
+            -target=google_compute_disk.openclaw_data \
+            -target=google_compute_address.static_ip \
+            -target=google_compute_firewall.allow_ssh \
+            -target=google_compute_firewall.allow_ui_from_cloudflare \
+            -target=cloudflare_record.openclaw_dns \
             -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
-            -var="signal_phone_number=${{ secrets.SIGNAL_PHONE_NUMBER }}" \
-            -var="image_tag=latest"
+            -var="signal_phone_number=${{ secrets.SIGNAL_PHONE_NUMBER }}"
 
   build-and-push:
     name: Build and Push Docker Image
@@ -140,7 +145,7 @@ jobs:
 
       - name: 'Docker Auth'
         run: |-
-          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
 
       - name: 'Build and Push'
         run: |-

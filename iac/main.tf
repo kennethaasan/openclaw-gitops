@@ -77,17 +77,35 @@ resource "google_compute_instance" "openclaw_server" {
   tags = ["openclaw-server"]
 }
 
-# 4. Firewall Rule (SSH and Web UI)
-resource "google_compute_firewall" "allow_ssh_and_ui" {
-  name    = "allow-ssh-and-ui"
+# 4. Firewall Rules
+# Allow SSH only via Google IAP TCP forwarding
+resource "google_compute_firewall" "allow_ssh" {
+  name    = "allow-ssh"
   network = "default"
 
   allow {
     protocol = "tcp"
-    ports    = ["22", "3000"]
+    ports    = ["22"]
   }
 
-  source_ranges = ["0.0.0.0/0"] # In production, restrict this to your IP
+  # Google IAP TCP forwarding egress range
+  source_ranges = ["35.235.240.0/20"]
+  target_tags   = ["openclaw-server"]
+}
+
+# Allow Web UI only from Cloudflare IPs
+data "cloudflare_ip_ranges" "cloudflare" {}
+
+resource "google_compute_firewall" "allow_ui_from_cloudflare" {
+  name    = "allow-ui-from-cloudflare"
+  network = "default"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["3000"]
+  }
+
+  source_ranges = data.cloudflare_ip_ranges.cloudflare.ipv4_cidrs
   target_tags   = ["openclaw-server"]
 }
 
@@ -95,8 +113,8 @@ resource "google_compute_firewall" "allow_ssh_and_ui" {
 resource "cloudflare_record" "openclaw_dns" {
   zone_id = var.cloudflare_zone_id
   name    = "openclaw"
-  value   = google_compute_address.static_ip.address
+  content = google_compute_address.static_ip.address
   type    = "A"
-  ttl     = 3600
-  proxied = false
+  ttl     = 1 # Automatic when proxied
+  proxied = true
 }

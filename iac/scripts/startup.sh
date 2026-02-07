@@ -74,8 +74,6 @@ services:
   signal-sidecar:
     image: bbernhard/signal-cli-rest-api:latest
     restart: always
-    ports:
-      - "8080:8080"
     environment:
       - MODE=json-rpc
     volumes:
