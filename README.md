@@ -48,17 +48,23 @@ Since the server is headless, you must authenticate locally and sync the session
 2. **Transfer the session to the VM:**
    The session is stored in `~/.config/opencode/`. You need to copy this folder to the VM's persistent mount at `/mnt/openclaw/config/opencode/`.
    ```bash
-   # Example using SCP (replace <VM_IP> with your server's IP)
-   scp -r ~/.config/opencode root@<VM_IP>:/mnt/openclaw/config/
+   # Use the provisioned domain: openclaw.aasan.dev
+   scp -r ~/.config/opencode root@openclaw.aasan.dev:/mnt/openclaw/config/
    ```
 
 ### 4. Link your Signal account
-1. SSH into the VM.
+1. SSH into the VM: `ssh root@openclaw.aasan.dev`
 2. Run the linking command:
    ```bash
    docker compose exec signal-sidecar signal-cli-rest-api link -n "OpenClaw-Agent"
    ```
 3. Scan the resulting QR code with your Signal app on iPhone (**Settings > Linked Devices**).
+
+## Quality & Security
+- **IaC Quality Gates:** Every pull request and push to main is validated via `terraform fmt`, `terraform validate`, and **TFLint** (with Google-specific rules).
+- **Code Linting:** Node.js and configuration files are linted and formatted via **Biome**.
+- **Immutable Artifacts:** Deployments use specific Docker image tags (Git SHA) pushed to a private **Google Artifact Registry**.
+- **Least Privilege:** The system uses a dedicated GCP Service Account with narrowly defined roles for deployment and runtime.
 
 ## Budget Management
 This setup is designed to stay under **$10/month**:

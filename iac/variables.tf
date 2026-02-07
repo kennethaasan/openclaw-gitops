@@ -31,3 +31,14 @@ variable "signal_phone_number" {
   description = "The phone number for Signal (E.164 format)"
   type        = string
 }
+
+variable "cloudflare_api_token" {
+  description = "Cloudflare API Token"
+  type        = string
+  sensitive   = true
+}
+
+variable "cloudflare_zone_id" {
+  description = "Cloudflare Zone ID for aasan.dev"
+  type        = string
+}

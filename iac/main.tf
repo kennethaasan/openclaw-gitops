@@ -3,6 +3,10 @@ provider "google" {
   region  = var.region
 }
 
+provider "cloudflare" {
+  api_token = var.cloudflare_api_token
+}
+
 # 1. Artifact Registry (Stores your custom OpenClaw images)
 resource "google_artifact_registry_repository" "openclaw_repo" {
   location      = var.region
@@ -85,4 +89,14 @@ resource "google_compute_firewall" "allow_ssh_and_ui" {
 
   source_ranges = ["0.0.0.0/0"] # In production, restrict this to your IP
   target_tags   = ["openclaw-server"]
+}
+
+# 5. DNS Record (openclaw.aasan.dev)
+resource "cloudflare_record" "openclaw_dns" {
+  zone_id = var.cloudflare_zone_id
+  name    = "openclaw"
+  value   = google_compute_address.static_ip.address
+  type    = "A"
+  ttl     = 3600
+  proxied = false
 }
