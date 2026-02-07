@@ -27,16 +27,18 @@ resource "google_artifact_registry_repository" "openclaw_repo" {
 
 # 1. Persistent Disk (Stores Signal sessions and Agent memory)
 resource "google_compute_disk" "openclaw_data" {
-  name = "openclaw-data-disk"
-  type = "pd-standard"
-  zone = var.zone
-  size = 10
+  name       = "openclaw-data-disk"
+  type       = "pd-standard"
+  zone       = var.zone
+  size       = 10
+  depends_on = [google_project_service.compute]
 }
 
 # 2. Static IP (Required for consistent communication)
 resource "google_compute_address" "static_ip" {
-  name   = "openclaw-static-ip"
-  region = var.region
+  name       = "openclaw-static-ip"
+  region     = var.region
+  depends_on = [google_project_service.compute]
 }
 
 # 3. The Spot VM
@@ -100,4 +102,5 @@ resource "google_compute_firewall" "allow_ssh_and_ui" {
 
   source_ranges = ["0.0.0.0/0"] # In production, restrict this to your IP
   target_tags   = ["openclaw-server"]
+  depends_on    = [google_project_service.compute]
 }
