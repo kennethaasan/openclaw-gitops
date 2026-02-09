@@ -6,11 +6,11 @@ FROM ghcr.io/openclaw/openclaw:latest
 USER root
 
 # Install Java 21 and other tools
-RUN apt-get update && apt-get install -y wget && \
-    mkdir -p /etc/apt/keyrings && \
-    wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc && \
-    echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/debian bookworm main" | tee /etc/apt/sources.list.d/adoptium.list && \
-    apt-get update && apt-get install -y temurin-21-jre curl jq && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl tar jq && rm -rf /var/lib/apt/lists/*
+
+# Install Temurin Java 21
+RUN curl -L https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.6%2B7/OpenJDK21U-jre_x64_linux_hotspot_21.0.6_7.tar.gz | tar -xz -C /opt && \
+    ln -sf /opt/jdk-21.0.6+7-jre/bin/java /usr/bin/java
 
 # Install signal-cli
 RUN curl -L https://github.com/AsamK/signal-cli/releases/download/v0.13.23/signal-cli-0.13.23.tar.gz | tar -xz -C /opt && \

@@ -93,28 +93,13 @@ resource "google_compute_firewall" "allow_ssh" {
   target_tags   = ["openclaw-server"]
 }
 
-# Allow Web UI only from Cloudflare IPs
-data "cloudflare_ip_ranges" "cloudflare" {}
-
-resource "google_compute_firewall" "allow_ui_from_cloudflare" {
-  name    = "allow-ui-from-cloudflare"
-  network = "default"
-
-  allow {
-    protocol = "tcp"
-    ports    = ["3000"]
-  }
-
-  source_ranges = data.cloudflare_ip_ranges.cloudflare.ipv4_cidr_blocks
-  target_tags   = ["openclaw-server"]
-}
-
-# 5. DNS Record (openclaw.aasan.dev)
-resource "cloudflare_record" "openclaw_dns" {
-  zone_id = var.cloudflare_zone_id
-  name    = "openclaw"
-  content = google_compute_address.static_ip.address
-  type    = "A"
-  ttl     = 1 # Automatic when proxied
-  proxied = true
-}
+# DNS Record (openclaw.aasan.dev) - Currently unused but kept for domain ownership/placeholder
+# If you want to use this, you'd need an LB or a secure proxy
+# resource "cloudflare_record" "openclaw_dns" {
+#   zone_id = var.cloudflare_zone_id
+#   name    = "openclaw"
+#   content = google_compute_address.static_ip.address
+#   type    = "A"
+#   ttl     = 1 # Automatic when proxied
+#   proxied = true
+# }

@@ -60,8 +60,11 @@ services:
     environment:
       - OPENCODE_CONFIG_DIR=/home/node/.config/opencode
       - OPENCLAW_CONFIG_PATH=/home/node/.openclaw/config.json
-      - OPENCLAW_GATEWAY_ENABLED=false
+      - OPENCLAW_GATEWAY_ENABLED=true
       - OPENCLAW_GATEWAY_TOKEN=dummy
+      - OPENCLAW_GATEWAY_BIND=0.0.0.0
+    ports:
+      - "127.0.0.1:18789:18789"
     volumes:
       - ./config.json:/home/node/.openclaw/config.json
       - .:/home/node/.openclaw
