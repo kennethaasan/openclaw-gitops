@@ -60,9 +60,40 @@ Since the server is headless, you must authenticate locally and sync the session
    ```
 2. Run the linking command:
    ```bash
-   docker compose exec signal-sidecar signal-cli-rest-api link -n "OpenClaw-Agent"
+   docker compose exec openclaw npx openclaw channels login signal
    ```
 3. Scan the resulting QR code with your Signal app on iPhone (**Settings > Linked Devices**).
+
+## Monitoring & Debugging
+
+### 1. Access the Control UI (Secure Tunnel)
+The OpenClaw debugging UI is not exposed to the internet for security. To open it, create a secure SSH tunnel from your laptop:
+
+```bash
+gcloud compute ssh openclaw-agent \
+  --zone=europe-north2-a \
+  --tunnel-through-iap \
+  -- -L 18789:localhost:18789
+```
+
+Once running, open your browser to [http://localhost:18789](http://localhost:18789).
+- **Gateway Token:** `dummy` (change this in `iac/scripts/startup.sh` for production).
+
+### 2. View Live Logs
+To see what the agent is thinking or debug Signal connection issues:
+
+```bash
+gcloud compute ssh openclaw-agent \
+  --zone=europe-north2-a \
+  --tunnel-through-iap \
+  --command="sudo docker logs -f openclaw-openclaw-1"
+```
+
+### 3. Testing the Bot
+The most reliable way to test the integration is to use **"Note to Self"** in Signal.
+1. Open Signal on your iPhone.
+2. Search for "Note to Self" and send a message like `"ping"`.
+3. If the agent is connected, you will see it process the message in the logs and respond.
 
 ## Quality & Security
 - **IaC Quality Gates:** Every pull request and push to main is validated via `terraform fmt`, `terraform validate`, and **TFLint** (with Google-specific rules).
