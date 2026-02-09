@@ -2,8 +2,19 @@
 # Using the latest stable version
 FROM ghcr.io/openclaw/openclaw:latest
 
-# Install dependencies for the Antigravity bridge
+# Install dependencies for the Antigravity bridge and Signal
 USER root
+
+# Install Java 21 and other tools
+RUN apt-get update && apt-get install -y wget && \
+    mkdir -p /etc/apt/keyrings && \
+    wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc && \
+    echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/debian bookworm main" | tee /etc/apt/sources.list.d/adoptium.list && \
+    apt-get update && apt-get install -y temurin-21-jre curl jq && rm -rf /var/lib/apt/lists/*
+
+# Install signal-cli
+RUN curl -L https://github.com/AsamK/signal-cli/releases/download/v0.13.23/signal-cli-0.13.23.tar.gz | tar -xz -C /opt && \
+    ln -s /opt/signal-cli-0.13.23/bin/signal-cli /usr/bin/signal-cli
 
 # Install Bun
 RUN curl -fsSL https://bun.sh/install | bash

@@ -40,14 +40,13 @@ IMAGE_URI="${region}-docker.pkg.dev/${project_id}/openclaw-repo/openclaw:${image
 
 cat <<EOF > config.json
 {
-  "provider": "opencode",
-  "model": "opencode/gemini-3-pro",
-  "flashModel": "opencode/gemini-3-flash",
   "channels": {
     "signal": {
       "enabled": true,
       "account": "${signal_phone_number}",
-      "httpUrl": "http://signal-sidecar:8080"
+      "cliPath": "signal-cli",
+      "dmPolicy": "pairing",
+      "autoStart": true
     }
   }
 }
@@ -67,17 +66,6 @@ services:
       - ./config.json:/home/node/.openclaw/config.json
       - .:/home/node/.openclaw
       - ./config/opencode:/home/node/.config/opencode
-    depends_on:
-      - signal-sidecar
-
-
-  signal-sidecar:
-    image: bbernhard/signal-cli-rest-api:latest
-    restart: always
-    environment:
-      - MODE=json-rpc
-    volumes:
-      - ./signal-data:/home/.local/share/signal-cli
 EOF
 
 # 5. Run it
