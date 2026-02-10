@@ -89,7 +89,7 @@ jobs:
         run: |
           terraform plan -input=false \
             -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
-            -var="signal_phone_number=${{ secrets.SIGNAL_PHONE_NUMBER }}" \
+            -var="telegram_bot_token=${{ secrets.TELEGRAM_BOT_TOKEN }}" \
             -var="image_tag=latest"
 
   deploy-infra:
@@ -121,7 +121,7 @@ jobs:
             -target=google_compute_firewall.allow_ui_from_cloudflare \
             -target=cloudflare_record.openclaw_dns \
             -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
-            -var="signal_phone_number=${{ secrets.SIGNAL_PHONE_NUMBER }}"
+            -var="telegram_bot_token=${{ secrets.TELEGRAM_BOT_TOKEN }}"
 
   build-and-push:
     name: Build and Push Docker Image
@@ -177,5 +177,5 @@ jobs:
         run: |
           terraform apply -auto-approve \
             -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
-            -var="signal_phone_number=${{ secrets.SIGNAL_PHONE_NUMBER }}" \
+            -var="telegram_bot_token=${{ secrets.TELEGRAM_BOT_TOKEN }}" \
             -var="image_tag=${{ github.sha }}"

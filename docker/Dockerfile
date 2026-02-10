@@ -2,19 +2,15 @@
 # Using the latest stable version
 FROM ghcr.io/openclaw/openclaw:latest
 
-# Install dependencies for the Antigravity bridge and Signal
+# Install dependencies for the Antigravity bridge
 USER root
 
-# Install Java 21 and other tools
+# Install Java 25 and other tools
 RUN apt-get update && apt-get install -y curl tar jq && rm -rf /var/lib/apt/lists/*
 
-# Install Temurin Java 21
-RUN curl -L https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.6%2B7/OpenJDK21U-jre_x64_linux_hotspot_21.0.6_7.tar.gz | tar -xz -C /opt && \
-    ln -sf /opt/jdk-21.0.6+7-jre/bin/java /usr/bin/java
-
-# Install signal-cli
-RUN curl -L https://github.com/AsamK/signal-cli/releases/download/v0.13.23/signal-cli-0.13.23.tar.gz | tar -xz -C /opt && \
-    ln -s /opt/signal-cli-0.13.23/bin/signal-cli /usr/bin/signal-cli
+# Install Temurin Java 25
+RUN curl -L https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.2%2B10/OpenJDK25U-jre_x64_linux_hotspot_25.0.2_10.tar.gz | tar -xz -C /opt && \
+    ln -sf /opt/jdk-25.0.2+10-jre/bin/java /usr/bin/java
 
 # Install Bun
 RUN curl -fsSL https://bun.sh/install | bash

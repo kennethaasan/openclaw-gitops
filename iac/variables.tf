@@ -27,9 +27,10 @@ variable "image_tag" {
   default     = "latest"
 }
 
-variable "signal_phone_number" {
-  description = "The phone number for Signal (E.164 format)"
+variable "telegram_bot_token" {
+  description = "The Telegram bot token (BotFather)"
   type        = string
+  sensitive   = true
 }
 
 variable "cloudflare_api_token" {

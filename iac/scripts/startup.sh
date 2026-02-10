@@ -33,20 +33,17 @@ cd $MOUNT_POINT
 
 # Ensure persistent directories exist and have correct permissions
 mkdir -p $MOUNT_POINT/config/opencode
-mkdir -p $MOUNT_POINT/signal-data
+mkdir -p $MOUNT_POINT/telegram-data
 chown -R 1000:1000 $MOUNT_POINT
 
 IMAGE_URI="${region}-docker.pkg.dev/${project_id}/openclaw-repo/openclaw:${image_tag}"
 
-cat <<EOF > config.json
+cat <<EOF > openclaw.json
 {
   "channels": {
-    "signal": {
+    "telegram": {
       "enabled": true,
-      "account": "${signal_phone_number}",
-      "cliPath": "signal-cli",
-      "dmPolicy": "pairing",
-      "autoStart": true
+      "dmPolicy": "pairing"
     }
   }
 }
@@ -59,16 +56,17 @@ services:
     restart: always
     environment:
       - OPENCODE_CONFIG_DIR=/home/node/.config/opencode
-      - OPENCLAW_CONFIG_PATH=/home/node/.openclaw/config.json
-      - OPENCLAW_GATEWAY_ENABLED=true
+      - OPENCLAW_CONFIG_PATH=/home/node/.openclaw/openclaw.json
       - OPENCLAW_GATEWAY_TOKEN=dummy
-      - OPENCLAW_GATEWAY_BIND=0.0.0.0
+      - OPENCLAW_GATEWAY_BIND=loopback
+      - TELEGRAM_BOT_TOKEN=${telegram_bot_token}
     ports:
       - "127.0.0.1:18789:18789"
     volumes:
-      - ./config.json:/home/node/.openclaw/config.json
+      - ./openclaw.json:/home/node/.openclaw/openclaw.json
       - .:/home/node/.openclaw
       - ./config/opencode:/home/node/.config/opencode
+      - ./telegram-data:/home/node/.openclaw/telegram
 EOF
 
 # 5. Run it

@@ -4,9 +4,9 @@ A professional-grade, zero-cost DevOps stack for running the **OpenClaw AI Agent
 
 ## Architecture
 - **Infrastructure:** GCP Spot VM (`e2-medium`) in Stockholm (`europe-north2`).
-- **Storage:** 10GB Persistent Disk for Signal sessions and Agent memory.
+- **Storage:** 10GB Persistent Disk for Agent memory.
 - **Brain:** Google Gemini 3 Pro/Flash via the `opencode-antigravity-auth` bridge.
-- **Interface:** Signal (as a linked device).
+- **Interface:** Telegram (Bot API).
 - **CI/CD:** GitHub Actions + Terraform Cloud.
   - Push to `main` performs: targeted core infra apply (registry/network/dns), Docker build+push, then VM update with the new Git SHA image tag.
 
@@ -30,7 +30,7 @@ Add the following to your GitHub Repo Secrets:
 - `TF_API_TOKEN`: Your Terraform Cloud API token.
 - `GCP_PROJECT_ID`: Your Google Cloud Project ID.
 - `GCP_CREDENTIALS`: Your GCP Service Account JSON key.
-- `SIGNAL_PHONE_NUMBER`: Your phone number in E.164 format.
+- `TELEGRAM_BOT_TOKEN`: Telegram bot token from @BotFather.
 
 ### 2. Version Management
 The version of OpenClaw is pinned in `docker/Dockerfile`. To update:
@@ -53,16 +53,14 @@ Since the server is headless, you must authenticate locally and sync the session
      --zone=europe-north2-a --tunnel-through-iap
    ```
 
-### 4. Link your Signal account
-1. SSH into the VM via IAP:
-   ```bash
-   gcloud compute ssh openclaw-agent --zone=europe-north2-a --tunnel-through-iap
-   ```
-2. Run the linking command:
-   ```bash
-   docker compose exec openclaw npx openclaw channels login signal
-   ```
-3. Scan the resulting QR code with your Signal app on iPhone (**Settings > Linked Devices**).
+### 4. Set up Telegram
+1. Create a bot with [@BotFather](https://t.me/BotFather):
+   - Run `/newbot` and follow the prompts.
+   - Copy the token and add it to GitHub Secrets as `TELEGRAM_BOT_TOKEN`.
+2. Deploy the change (push to `main`). The VM will restart OpenClaw with the new token.
+3. (Optional) If you want the bot to read all group messages, disable privacy mode with:
+   - In @BotFather: `/setprivacy` → **Disable**
+   - Remove + re-add the bot to each group after changing privacy.
 
 ## Monitoring & Debugging
 
@@ -78,9 +76,14 @@ gcloud compute ssh openclaw-agent \
 
 Once running, open your browser to [http://localhost:18789](http://localhost:18789).
 - **Gateway Token:** `dummy` (change this in `iac/scripts/startup.sh` for production).
+- **Pair the browser once (required):**
+  ```bash
+  docker compose exec openclaw node /app/openclaw.mjs devices list
+  docker compose exec openclaw node /app/openclaw.mjs devices approve <requestId>
+  ```
 
 ### 2. View Live Logs
-To see what the agent is thinking or debug Signal connection issues:
+To see what the agent is thinking or debug Telegram connection issues:
 
 ```bash
 gcloud compute ssh openclaw-agent \
@@ -90,10 +93,17 @@ gcloud compute ssh openclaw-agent \
 ```
 
 ### 3. Testing the Bot
-The most reliable way to test the integration is to use **"Note to Self"** in Signal.
-1. Open Signal on your iPhone.
-2. Search for "Note to Self" and send a message like `"ping"`.
+For Telegram, send a DM to your bot from your personal Telegram account.
+1. Open Telegram and search for your bot username (the one you created via @BotFather).
+2. Send a message like `"ping"`.
 3. If the agent is connected, you will see it process the message in the logs and respond.
+
+> **Note:** Telegram DMs default to **pairing**. If this is your first message, the bot will reply
+> with a pairing code; approve it with:
+> ```bash
+> docker compose exec openclaw node /app/openclaw.mjs pairing list telegram
+> docker compose exec openclaw node /app/openclaw.mjs pairing approve telegram <CODE>
+> ```
 
 ## Quality & Security
 - **IaC Quality Gates:** Every pull request and push to main is validated via `terraform fmt`, `terraform validate`, and **TFLint** (with Google-specific rules).

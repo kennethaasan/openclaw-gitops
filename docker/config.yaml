@@ -17,8 +17,5 @@ plugins:
   - "opencode-antigravity-auth"
 
 channels:
-  signal:
+  telegram:
     enabled: true
-    account: ${SIGNAL_ACCOUNT}
-    httpUrl: ${SIGNAL_URL}
-    autoStart: false
